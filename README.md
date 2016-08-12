@@ -1,4 +1,11 @@
-# my-nodejs-ke-jian-2
+# 2017-7-31
+```
+这里 启动 命令最好用 supervisor 启动
+  例如：
+    supervisor 15-get-server.js
+
+```
+
 ```
 // 文件相关操作
 //  找加内容     fs.appendFile('找加内容的文件及路径'，‘找加的内容’，fcDb(err))
