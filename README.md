@@ -469,6 +469,6 @@ http.createServer(function(req,res,next){
     console.log(POST) // { username: 'zhang', password: '123' }
   });
 }).listen(8081,function(){
-  console.log('您打开了 supervisor 19-post_server.js 的服务')
+  console.log('您打开了 supervisor 20-post_server.js 的服务')
 })
 ```
