@@ -118,3 +118,283 @@ var jquery=require('jquery');
 console.log(jquery);
 
 ```
+
+```
+//这个页面说明一个问题 ，nodejs 是这样获取 表单提交的数据的，php 显得更加简单，但nodejs 显得更加灵活
+const http=require('http');
+
+http.createServer(function(req,res){
+    console.log('有人来了:'+req.url);
+    var $_GET={};
+    var url='';
+    if(req.url.indexOf('?')!=-1){
+        var arr = req.url.split('?'); //[ '/abc', 'text=sds&password=ssds' ]
+        url = arr[0]; //    /abc
+        var arr2 = arr[1].split('&');
+        for(var i=0;i<arr2.length;i++){
+            var arr3 = arr2[i].split('=');
+            //arr3[0] =》 text 、 password
+            //arr3[1] =》  value1 、 value2
+            $_GET[arr3[0]]=arr3[1]; // { text: 'zhang', password: '1234567' }
+
+        }
+    }
+    //这个相当于下面的 php的方式
+    // console.log($_GET)  //{ text: 'zhang', password: '1234567' }
+    //===========================
+
+
+    var text = $_GET['text'];
+    var password = $_GET['password'];
+    console.log(text);
+    console.log(password)
+}).listen(8081,function(){
+    console.log('启动时打开 supervisor 11-get-server.js')
+});
+
+```
+
+```
+// 这个页面主要就是 封装了表单提交 方法
+var http = require('http');
+
+
+
+http.createServer(function(req,res,next){
+    console.log('有人来了'+req.url);
+    var $_GET = {};
+    var url = ''; // 这个是 存放  /abc 的，如果需要可以拿走用，不过现在没有什么用
+    if(req.url.indexOf('?')!==-1){
+        var arr = req.url.split('?');
+        url = arr[0];
+        $_GET = url2json(arr[1]);  //  { text: 'zhang', password: '1234567' }
+    }else{
+        url = req.url;
+    }
+    console.log($_GET)
+}).listen('8081',function(){
+    console.log('启动时打开 supervisor 12-get-server.js')
+});
+
+```
+
+```
+// 这个页面 1，让封装的方法引入 并成功调用。2，成功拿到 表单提交的数据
+
+var http = require('http');
+var url2json = require('./url2json');
+http.createServer(function(req,res,next){
+    console.log('有人来了'+req.url);
+    var $_GET = {};
+    var url = '';
+    if(req.url.indexOf('?')!=-1){
+        var arr = req.url.split('?');
+        url = arr[0];
+        $_GET = url2json.parse(arr[1]);
+
+    }else{
+        url = req.url;
+    }
+    console.log($_GET)
+}).listen(8081,function(){
+    console.log('端口打开是 ： supervisor 13-get-server.js')
+});
+
+```
+
+```
+
+// 这个页面 1，让封装的方法引入 并成功调用。2，成功拿到 表单提交的数据
+
+var http = require('http');
+var url2json = require('parse-get-data');
+http.createServer(function(req,res,next){
+    console.log('有人来了'+req.url);
+    var $_GET = {};
+    var url = '';
+    if(req.url.indexOf('?')!=-1){
+        var arr = req.url.split('?');
+        url = arr[0];
+        $_GET = url2json.parse(arr[1]);
+
+    }else{
+        url = req.url;
+    }
+    console.log($_GET);
+}).listen(8081,function(){
+    console.log('端口打开是 ： supervisor 14-get-server.js')
+});
+```
+
+```
+
+// 这个页面 去除了自己切分方法，改用系统自带的 querystring: =》（谷歌翻译：这个意思是查询字符串） 切分方法
+// 需要知道的是 这种系统自带的 方法速度比自己写的，更快
+var http = require('http');
+var querystring = require('querystring');
+
+http.createServer(function(req,res,next){
+    console.log('有人来了'+req.url);
+    var $_GET = {};
+    var url = '';
+    if(req.url.indexOf('?')!==-1){
+      var arr = req.url.split('?');
+      url = arr[0];
+      $_GET = querystring.parse(arr[1]);
+    }else{
+      url = req.url;
+    }
+    console.log($_GET);
+}).listen(8081,function(){
+  console.log('端口打开为： supervisor 15-get-server.js');
+})
+
+```
+
+```
+
+
+// 这个页面 显示了 系统 自带的 url 相关操作,下面三个 打印出来 可以看看都有什么
+// 1,    urlLib.parse(req.url,true)
+// 2,    urlLib.resolveObject(req.url,true)
+// 3,    urlLib.format(req.url,true)
+var http = require('http');
+var urlLib = require('url');
+http.createServer(function(req,res,next){
+  console.log('有人来了'+req.url);
+  var $_GET = {};
+  var url = '';
+
+  $_GET = urlLib.parse(req.url,true).query; //    { username: 'zhang', password: '333' }
+  url = urlLib.parse(req.url,true).pathname; //     /abc
+  console.log($_GET); // 结果 { username: 'zhang', password: '333' }
+
+  //console.log( urlLib.parse(req.url,true))
+    /*
+      这是打印的结果
+      Url {
+        protocol: null,
+        slashes: null,
+        auth: null,
+        host: null,
+        port: null,
+        hostname: null,
+        hash: null,
+        search: '?username=zhang&password=123',
+        query: { username: 'zhang', password: '123' },
+        pathname: '/abc',
+        path: '/abc?username=zhang&password=123',
+        href: '/abc?username=zhang&password=123'
+      }
+
+    */
+// console.log( urlLib.resolveObject(req.url,true))
+    /*
+    这是打印的结果
+    Url {
+     protocol: null,
+     slashes: undefined,
+     auth: null,
+     host: null,
+     port: null,
+     hostname: null,
+     hash: undefined,
+     search: '?username=zhang&password=123',
+     query: 'username=zhang&password=123',
+     pathname: '/abc',
+     path: '/abc?username=zhang&password=123',
+     href: '/abc?username=zhang&password=123'
+   }
+    */
+
+ //console.log( urlLib.format(req.url,true))
+    /*
+      这是打印的结果
+      /abc?username=zhang&password=123
+    */
+
+}).listen(8081,function(){
+  console.log('打开的文件是： supervisor 16-get-server.js');
+})
+
+```
+
+```
+// 分解讲解, 第一步 url.parse(path,true)
+
+var url = require('url');
+
+var str = 'http://localhost:8081/name=zhang&age=13';
+
+console.log(url.parse(str,true));
+/*
+Url {
+  protocol: 'http:',
+  slashes: true,
+  auth: null,
+  host: 'localhost:8081',
+  port: '8081',
+  hostname: 'localhost',
+  hash: null,
+  search: '?name=zhang&age=13',
+  query: { name: 'zhang', age: '13' },
+  pathname: '/abc',
+  path: '/abc?name=zhang&age=13',
+  href: 'http://localhost:8081/abc?name=zhang&age=13'
+}
+*/
+
+
+```
+
+```
+
+// 分解讲解, 第二步 url.format(json)
+// 它的位置可以 随意调换,它打印的结果 还是一样
+var url = require('url');
+
+var json = {
+  protocol:'http',     // 协议
+  pathname:'abc.html', // 路径
+  hostname:'baidu.com', //主机名
+  port:8080        // 端口
+
+
+}
+console.log(url.format(json)) // http://baidu.com:8080/abc.html
+
+```
+
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>智能社——http://www.zhinengshe.com</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <style>
+
+    </style>
+    <script>
+
+    </script>
+</head>
+<body>
+<form action="http://localhost:8081/abc">
+    user:
+    <input type="text" name="username">
+    <br>
+    password:
+    <input type="password" name="password">
+    <br>
+    <input type="submit">
+</form>
+</body>
+</html>
+
+
+
+```
